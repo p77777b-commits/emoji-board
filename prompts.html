@@ -1,0 +1,32 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ARISE PROMPT</title><style>
+
+:root{--bg:#f5f5f5;--card:#fff;--line:#dedede;--text:#171717;--muted:#6d6d6d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,'Noto Sans KR',sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.back{color:#333;text-decoration:none;font-weight:700}.pill{font-size:12px;color:#666;border:1px solid #d6d6d6;border-radius:999px;padding:6px 9px;background:#fff}
+h1{margin:0;font-size:30px}.sub{color:var(--muted);margin:7px 0 0}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+input,textarea,select,button{font:inherit}input,textarea,select{width:100%;border:1px solid #ccc;border-radius:9px;padding:10px;background:#fff}
+textarea{min-height:150px;resize:vertical}.btn{border:1px solid #bbb;background:#fff;border-radius:9px;padding:9px 12px;cursor:pointer}.btn.primary{background:#222;color:#fff;border-color:#222}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:680px){.grid{grid-template-columns:1fr}.wrap{padding:18px 12px 44px}}
+.layout{display:grid;grid-template-columns:320px 1fr;gap:12px}.list{max-height:68vh;overflow:auto}.item{padding:12px;border-bottom:1px solid #eee;cursor:pointer}.item:hover{background:#fafafa}.item b{display:block}.tiny{font-size:12px;color:#777;margin-top:4px}.toolbar{display:flex;gap:7px;margin-bottom:10px}@media(max-width:760px){.layout{grid-template-columns:1fr}}
+</style></head><body><div class="wrap"><div class="top"><a class="back" href="index.html">← HOME</a><span class="pill">localStorage · v0.1</span></div><h1>💬 프롬프트</h1><p class="sub">자주 쓰는 프롬프트를 저장하고 검색·수정·복사합니다.</p>
+<div class="toolbar"><button class="btn primary" onclick="newP()">+ 새 프롬프트</button><input id="q" placeholder="검색" oninput="render()" style="max-width:330px"></div>
+<div class="layout"><div class="card list" id="list"></div><div class="card">
+<label>제목</label><input id="title" placeholder="프롬프트 제목"><br><br><label>분류</label><select id="cat"><option>ChatGPT</option><option>이미지 생성</option><option>출판</option><option>콘텐츠</option><option>프로젝트 관리</option><option>기타</option></select><br><br>
+<label>태그</label><input id="tags" placeholder="예: ARISE, 조사, 이미지"><br><br><label>본문</label><textarea id="body" placeholder="프롬프트 내용을 입력하세요"></textarea>
+<div class="row" style="margin-top:10px"><button class="btn primary" onclick="saveP()">저장</button><button class="btn" onclick="copyP()">복사</button><button class="btn" onclick="delP()">삭제</button></div>
+</div></div></div>
+<script>
+const K='arisePromptsV1';let a=JSON.parse(localStorage.getItem(K)||'[]'),sel=null;
+const $=id=>document.getElementById(id);function persist(){localStorage.setItem(K,JSON.stringify(a))}
+function newP(){sel=null;$('title').value='';$('tags').value='';$('body').value='';$('cat').value='ChatGPT'}
+function saveP(){let t=$('title').value.trim(),b=$('body').value.trim();if(!t&&!b)return;let now=new Date().toISOString();if(sel){let x=a.find(x=>x.id===sel);Object.assign(x,{title:t||'제목 없음',body:b,cat:$('cat').value,tags:$('tags').value,updatedAt:now})}else{let x={id:crypto.randomUUID(),title:t||'제목 없음',body:b,cat:$('cat').value,tags:$('tags').value,updatedAt:now};a.unshift(x);sel=x.id}persist();render()}
+function openP(id){sel=id;let x=a.find(x=>x.id===id);$('title').value=x.title;$('body').value=x.body;$('cat').value=x.cat||'기타';$('tags').value=x.tags||''}
+function delP(){if(!sel)return;a=a.filter(x=>x.id!==sel);persist();newP();render()}
+async function copyP(){await navigator.clipboard.writeText($('body').value);}
+function render(){let q=$('q').value.toLowerCase();$('list').innerHTML='';a.filter(x=>(x.title+' '+x.body+' '+x.tags+' '+x.cat).toLowerCase().includes(q)).forEach(x=>{let d=document.createElement('div');d.className='item';d.innerHTML='<b>'+esc(x.title)+'</b><div class="tiny">'+esc(x.cat||'')+' · '+esc(x.tags||'')+'</div>';d.onclick=()=>openP(x.id);$('list').appendChild(d)})}
+function esc(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}render();
+</script></body></html>

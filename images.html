@@ -1,0 +1,21 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ARISE IMAGE LIBRARY</title><style>
+
+:root{--bg:#f5f5f5;--card:#fff;--line:#dedede;--text:#171717;--muted:#6d6d6d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,'Noto Sans KR',sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.back{color:#333;text-decoration:none;font-weight:700}.pill{font-size:12px;color:#666;border:1px solid #d6d6d6;border-radius:999px;padding:6px 9px;background:#fff}
+h1{margin:0;font-size:30px}.sub{color:var(--muted);margin:7px 0 0}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+input,textarea,select,button{font:inherit}input,textarea,select{width:100%;border:1px solid #ccc;border-radius:9px;padding:10px;background:#fff}
+textarea{min-height:150px;resize:vertical}.btn{border:1px solid #bbb;background:#fff;border-radius:9px;padding:9px 12px;cursor:pointer}.btn.primary{background:#222;color:#fff;border-color:#222}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:680px){.grid{grid-template-columns:1fr}.wrap{padding:18px 12px 44px}}
+.notice{margin:14px 0}.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.imgcard{background:#fff;border:1px solid #ddd;border-radius:11px;overflow:hidden}.imgcard img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}.imgmeta{padding:8px;font-size:12px}@media(max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><div class="wrap"><div class="top"><a class="back" href="index.html">← HOME</a><span class="pill">v0.1</span></div><h1>🖼️ 이미지</h1><p class="sub">GitHub Pages에서 이미지 자산을 찾아보고 관리하기 위한 첫 화면입니다.</p>
+<div class="card notice"><b>현재 저장 방식</b><p class="sub">이번 버전은 이미지 보관함 UI와 목록 인덱스를 먼저 제공합니다. 실제 GitHub 저장소에 이미지를 추가하면 <code>images/</code> 폴더의 파일을 이 페이지에서 연결할 수 있습니다. 브라우저에서 선택한 로컬 이미지를 GitHub에 자동 업로드하는 기능은 인증/API 연결 단계에서 구현합니다.</p></div>
+<div class="row"><input id="q" placeholder="🔎 이미지 이름·태그 검색" oninput="render()"><button class="btn" onclick="alert('다음 공정: GitHub API 또는 외부 스토리지 연결 후 활성화')">+ 이미지 추가</button></div>
+<div id="gallery" class="gallery" style="margin-top:12px"></div></div>
+<script>
+const items=JSON.parse(localStorage.getItem('ariseImageIndexV1')||'[]');function render(){let q=document.getElementById('q').value.toLowerCase(),g=document.getElementById('gallery');g.innerHTML='';items.filter(x=>(x.name+' '+(x.tags||'')).toLowerCase().includes(q)).forEach(x=>{let d=document.createElement('div');d.className='imgcard';d.innerHTML='<img src="'+x.src+'" alt=""><div class="imgmeta"><b>'+x.name+'</b><br>'+(x.tags||'')+'</div>';g.appendChild(d)})}render();
+</script></body></html>

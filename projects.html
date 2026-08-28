@@ -1,0 +1,25 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ARISE PROJECTS</title><style>
+
+:root{--bg:#f5f5f5;--card:#fff;--line:#dedede;--text:#171717;--muted:#6d6d6d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,'Noto Sans KR',sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.back{color:#333;text-decoration:none;font-weight:700}.pill{font-size:12px;color:#666;border:1px solid #d6d6d6;border-radius:999px;padding:6px 9px;background:#fff}
+h1{margin:0;font-size:30px}.sub{color:var(--muted);margin:7px 0 0}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+input,textarea,select,button{font:inherit}input,textarea,select{width:100%;border:1px solid #ccc;border-radius:9px;padding:10px;background:#fff}
+textarea{min-height:150px;resize:vertical}.btn{border:1px solid #bbb;background:#fff;border-radius:9px;padding:9px 12px;cursor:pointer}.btn.primary{background:#222;color:#fff;border-color:#222}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:680px){.grid{grid-template-columns:1fr}.wrap{padding:18px 12px 44px}}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.proj{margin:8px 0;padding:12px;border:1px solid #e3e3e3;border-radius:10px;background:#fff}.proj input{margin-top:6px}@media(max-width:760px){.cols{grid-template-columns:1fr}}
+</style></head><body><div class="wrap"><div class="top"><a class="back" href="index.html">← HOME</a><span class="pill">localStorage · v0.1</span></div><h1>📂 프로젝트</h1><p class="sub">프로젝트별 현재 작업·다음 행동·상태를 간단히 유지합니다.</p>
+<div class="card row"><input id="name" placeholder="프로젝트 이름"><select id="status" style="max-width:130px"><option>진행중</option><option>보류</option><option>완료</option></select><button class="btn primary" onclick="add()">추가</button></div>
+<div class="cols" style="margin-top:12px"><div class="card"><b>▶ 진행중</b><div id="진행중"></div></div><div class="card"><b>⏸ 보류</b><div id="보류"></div></div><div class="card"><b>✓ 완료</b><div id="완료"></div></div></div></div>
+<script>
+const K='ariseProjectsV1';let a=JSON.parse(localStorage.getItem(K)||'[]');const $=id=>document.getElementById(id);function save(){localStorage.setItem(K,JSON.stringify(a))}
+function add(){let n=$('name').value.trim();if(!n)return;a.push({id:crypto.randomUUID(),name:n,status:$('status').value,current:'',next:''});$('name').value='';save();render()}
+function upd(id,k,v){let x=a.find(x=>x.id===id);x[k]=v;save();if(k==='status')render()}
+function delp(id){a=a.filter(x=>x.id!==id);save();render()}
+function render(){['진행중','보류','완료'].forEach(s=>$(s).innerHTML='');a.forEach(x=>{let d=document.createElement('div');d.className='proj';d.innerHTML='<b>'+esc(x.name)+'</b><select onchange="upd(\''+x.id+'\',\'status\',this.value)"><option '+(x.status==='진행중'?'selected':'')+'>진행중</option><option '+(x.status==='보류'?'selected':'')+'>보류</option><option '+(x.status==='완료'?'selected':'')+'>완료</option></select><input placeholder="현재 작업" value="'+esc(x.current)+'" onchange="upd(\''+x.id+'\',\'current\',this.value)"><input placeholder="다음 행동" value="'+esc(x.next)+'" onchange="upd(\''+x.id+'\',\'next\',this.value)"><button class="btn" style="margin-top:7px" onclick="delp(\''+x.id+'\')">삭제</button>';$(x.status).appendChild(d)})}
+function esc(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}render();
+</script></body></html>

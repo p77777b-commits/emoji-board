@@ -1,36 +1,50 @@
-<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ARISE HOME v0.12</title>
-<style>
-:root{--bg:#f5f6f8;--card:#fff;--line:#d9d9d9;--text:#171717;--muted:#737373}
-*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI","Noto Sans KR",sans-serif;background:var(--bg);color:var(--text)}
-a{color:inherit;text-decoration:none}.wrap{max-width:780px;margin:0 auto;padding:40px 18px 28px}
-header{text-align:center;margin-bottom:26px}h1{font-size:28px;margin:0 0 6px;letter-spacing:.3px}header p{margin:0;color:var(--muted);font-size:14px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.card{min-height:112px;background:var(--card);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;transition:.12s ease}
-.card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.06);border-color:#bdbdbd}
-.icon{font-size:34px;line-height:1}.label{font-size:17px;font-weight:700}
-.footer{border-top:1px solid #ddd;margin-top:20px;padding-top:14px;text-align:center;color:#666;font-size:13px}
-.footer nav{display:flex;justify-content:center;gap:20px;flex-wrap:wrap}.version{margin-top:12px;color:#aaa;font-size:10px}
-@media(max-width:600px){.wrap{padding-top:24px}.grid{grid-template-columns:1fr}.card{min-height:92px}header{margin-bottom:18px}}
-</style>
-</head>
-<body><main class="wrap">
-<header><h1>ARISE</h1><p>필요한 일을 바로 시작하세요</p></header>
-<section class="grid" aria-label="주요 도구">
-<a class="card" href="memo.html"><span class="icon">📝</span><span class="label">메모</span></a>
-<a class="card" href="emoji.html"><span class="icon">⌨️</span><span class="label">이모지</span></a>
-<a class="card" href="todo.html"><span class="icon">✅</span><span class="label">할일</span></a>
-<a class="card" href="toolbox.html"><span class="icon">🧰</span><span class="label">도구</span></a>
-</section>
-<footer class="footer">
-<nav>
-<a href="guide.html">📘 사용법</a>
-<a href="guide.html#help">🆘 도움말</a>
-<a href="guide.html#about">ℹ️ ARISE</a>
-</nav>
-<div class="version">PORTAL MVP v0.12</div>
-</footer>
-</main></body></html>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ARISE HOME v0.13</title><style>
+
+:root{--bg:#f5f5f5;--card:#fff;--line:#dedede;--text:#171717;--muted:#6d6d6d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,'Noto Sans KR',sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.back{color:#333;text-decoration:none;font-weight:700}.pill{font-size:12px;color:#666;border:1px solid #d6d6d6;border-radius:999px;padding:6px 9px;background:#fff}
+h1{margin:0;font-size:30px}.sub{color:var(--muted);margin:7px 0 0}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+input,textarea,select,button{font:inherit}input,textarea,select{width:100%;border:1px solid #ccc;border-radius:9px;padding:10px;background:#fff}
+textarea{min-height:150px;resize:vertical}.btn{border:1px solid #bbb;background:#fff;border-radius:9px;padding:9px 12px;cursor:pointer}.btn.primary{background:#222;color:#fff;border-color:#222}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:680px){.grid{grid-template-columns:1fr}.wrap{padding:18px 12px 44px}}
+
+.hero{text-align:center;padding:14px 0 18px}.hero h1{font-size:34px;letter-spacing:.5px}.hero p{color:#666;margin:7px 0 0}
+.search{max-width:720px;margin:0 auto 22px}.search input{font-size:16px;padding:13px 14px}
+.section{margin-top:20px}.section h2{font-size:16px;margin:0 0 10px;color:#333}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tile{display:block;text-decoration:none;color:#111;background:#fff;border:1px solid #ddd;border-radius:14px;padding:18px 10px;text-align:center;min-height:92px}
+.tile:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.07)}.ico{font-size:27px;display:block;margin-bottom:8px}.label{font-weight:800}
+.work{display:grid;grid-template-columns:1.35fr .65fr;gap:12px}.resume{padding:18px}.resume strong{font-size:18px}.meta{font-size:13px;color:#777;margin-top:7px;line-height:1.6}
+.asset{grid-template-columns:repeat(4,minmax(0,1fr))}.foot{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:26px;font-size:13px}
+.foot a{color:#555;text-decoration:none}
+@media(max-width:720px){.tiles,.asset{grid-template-columns:repeat(2,1fr)}.work{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<div class="hero"><h1>ARISE</h1><p>필요한 일을 바로 시작하세요.</p></div>
+<div class="search"><input id="homeSearch" placeholder="🔎 메모·프로젝트·프롬프트·이미지 찾기" onkeydown="if(event.key==='Enter')location.href='search.html?q='+encodeURIComponent(this.value)"></div>
+
+<section class="section"><h2>⚡ 바로 쓰기</h2><div class="tiles">
+<a class="tile" href="memo.html"><span class="ico">📝</span><span class="label">메모</span></a>
+<a class="tile" href="emoji.html"><span class="ico">⌨️</span><span class="label">이모지</span></a>
+<a class="tile" href="todo.html"><span class="ico">✅</span><span class="label">할일</span></a>
+<a class="tile" href="toolbox.html"><span class="ico">🧰</span><span class="label">도구</span></a>
+</div></section>
+
+<section class="section"><h2>📂 내 작업</h2><div class="work">
+<a class="card resume" href="projects.html" style="text-decoration:none;color:inherit"><div>▶ 이어서 하기</div><strong>프로젝트 작업판</strong><div class="meta">진행중 · 보류 · 완료 프로젝트를 한곳에서 관리<br>현재 작업과 다음 행동을 프로젝트별로 기록</div></a>
+<div class="card"><b>빠른 진입</b><div class="meta">최근 작업과 프로젝트 상태는 프로젝트판에서 관리합니다.</div><p><a class="btn" href="projects.html" style="display:inline-block;text-decoration:none;color:#111">프로젝트 전체 보기</a></p></div>
+</div></section>
+
+<section class="section"><h2>📚 자료·자산</h2><div class="tiles asset">
+<a class="tile" href="prompts.html"><span class="ico">💬</span><span class="label">프롬프트</span></a>
+<a class="tile" href="images.html"><span class="ico">🖼️</span><span class="label">이미지</span></a>
+<a class="tile" href="search.html"><span class="ico">🔎</span><span class="label">통합검색</span></a>
+<a class="tile" href="archive.html"><span class="ico">🗄️</span><span class="label">아카이브</span></a>
+</div></section>
+
+<div class="foot"><a href="guide.html">📘 사용법</a><a href="toolbox.html">🆘 도움</a><a href="settings.html">⚙️ 설정</a><span>PORTAL MVP v0.13</span></div>
+</div></body></html>
