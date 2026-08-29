@@ -132,6 +132,37 @@ const ARISE_EMOJI_FRONT_GROUPS=[
   ]]
 ];
 
+
+const ARISE_CAPTURE_ACTIVITY_ART=[
+"🎨","🎭","🎬","🎤","🎧","🎼","🎵","🎶","🎹","🥁","🪘","🪇","🎷","🎺","🪗","🎸","🎻","🪕",
+"🔇","🔈","🔉","🔊","📢","📣","📯","🔔","🔕","🎙️","🎚️","🎛️","📻"
+];
+
+const ARISE_CAPTURE_OBJECT_WORK=[
+"👓","🕶️","🥽","🥼","🦺","👔","👕","👖","🧣","🧤","🧥","🧦","👗","👘","🥻","🩱","🩲","🩳","👙","👚",
+"🪭","👛","👜","👝","🛍️","🎒","🩴","👞","👟","🥾","🥿","👠","👡","🩰","👢","🪮","👑","👒","🎩","🎓","🧢","🪖","⛑️","📿","💄","💍","💎",
+"📱","📲","☎️","📞","📟","📠","🔋","🪫","🔌","💻","🖥️","🖨️","⌨️","🖱️","🖲️","💽","💾","💿","📀",
+"📺","📷","📸","📹","🎥","📽️","🎞️",
+"💉","🩸","💊","🩹","🩼","🩺","🩻","🚪","🛗","🪞","🪟","🛏️","🛋️","🪑","🚽","🪠","🚿","🛁","🪤","🪒","🧴","🧷","🧹","🧺","🧻","🪣","🧼","🫧","🪥","🧽","🧯","🛒","🚬","⚰️","🪦","⚱️","🗿","🪧","🪪",
+"🔒","🔓","🔏","🔐","🔑","🗝️","🔨","🪓","⛏️","⚒️","🛠️","🗡️","⚔️","🪃","🏹","🛡️","🪚","🔧","🪛","🔩","⚙️","🗜️","⚖️","🦯","🔗","⛓️","🪝","🧰","🧲","🪜","🧪","🧬","🔬","🔭",
+"💷","💸","💵","💴","💶","🪙","💳","🧾","💰",
+"✉️","📧","📨","📩","📤","📥","📦","📫","📪","📬","📭","📮","🗳️",
+"✏️","✒️","🖋️","🖊️","🖌️","🖍️","📝","💼","📁","📂","🗂️","📅","📆","🗒️","🗓️",
+"📈","📉","📊","📋","📌","📍","📎","🖇️","📏","📐","✂️","🗃️","🗄️","🗑️","📄","📃","📑","🧾","🗒️","📝","📰","🗞️","📜","📕","📗","📘","📙","📚","📖","🔖","🏷️","📁","📂","🗂️","🗃️","🗄️","📇","🗳️","🗑️"
+];
+
+function ariseMergeEmojiChars(base, extra, label){
+  const out=[], seen=new Set();
+  const add=(emoji,name)=>{
+    if(!emoji || seen.has(emoji)) return;
+    seen.add(emoji);
+    out.push({emoji,name:name||label});
+  };
+  for(const e of extra) add(e,label);
+  for(const item of (base||[])) add(item.emoji,item.name);
+  return out;
+}
+
 const GROUP_KO={"Smileys & Emotion": "😀 표정·감정", "People & Body": "👋 사람·신체", "Component": "🧩 구성요소", "Animals & Nature": "🐶 동물·자연", "Food & Drink": "🍜 음식·음료", "Travel & Places": "🚗 여행·장소", "Activities": "🎨 활동·예술", "Objects": "🗂️ 사물·업무", "Symbols": "🚦 기호", "Flags": "🏳️ 깃발"};
 let currentView='symbol', emojiLoaded=false, allEmoji=[];
 const search=document.getElementById('search'), symbolArea=document.getElementById('symbolArea'),
@@ -202,7 +233,7 @@ function ariseGroupKey(el){
   return el.dataset.label || (el.querySelector('h2')?.textContent || '').replace(/\s*·\s*\d+\s*$/,'').trim();
 }
 function ariseOrderStorageKey(mode){
-  return mode==='emoji' ? 'areumGroupOrderV7_emoji' : 'areumGroupOrderV3_'+mode;
+  return mode==='emoji' ? 'areumGroupOrderV8_emoji' : 'areumGroupOrderV3_'+mode;
 }
 function ariseApplySavedOrder(container, selector, mode){
   let saved=[];
@@ -291,12 +322,14 @@ function renderGroups(groups, sourceLabel){
   }
 
   // 사용자 지정 그림·이모지 선두 순서
-  if(groups["Activities"]){
-    appendEmojiSection(GROUP_KO["Activities"]||"🎨 활동·예술",groups["Activities"],"Activities");
+  {
+    const merged=ariseMergeEmojiChars(groups["Activities"]||[],ARISE_CAPTURE_ACTIVITY_ART,"🎨 활동·예술");
+    appendEmojiSection(GROUP_KO["Activities"]||"🎨 활동·예술",merged,"Activities");
   }
 
-  if(groups["Objects"]){
-    appendEmojiSection(GROUP_KO["Objects"]||"🗂️ 사물·업무",groups["Objects"],"Objects");
+  {
+    const merged=ariseMergeEmojiChars(groups["Objects"]||[],ARISE_CAPTURE_OBJECT_WORK,"🗂️ 사물·업무");
+    appendEmojiSection(GROUP_KO["Objects"]||"🗂️ 사물·업무",merged,"Objects");
   }
 
   const jobs=ARISE_EMOJI_FRONT_GROUPS.find(([label])=>label.includes("직업별"));
@@ -331,7 +364,18 @@ function renderGroups(groups, sourceLabel){
 }
 function fallbackGroups(){
   const obj={};
-  for(const [cat,chars] of FALLBACK) obj[cat]=chars.map(x=>({emoji:x,name:cat}));
+  const map={
+    "😀 표정·감정":"Smileys & Emotion",
+    "👋 사람·신체":"People & Body",
+    "⚽ 활동·예술":"Activities",
+    "🎨 활동·예술":"Activities",
+    "💻 사물·업무":"Objects",
+    "🗂️ 사물·업무":"Objects"
+  };
+  for(const [cat,chars] of FALLBACK){
+    const key=map[cat]||cat;
+    obj[key]=chars.map(x=>({emoji:x,name:cat}));
+  }
   return obj;
 }
 async function loadEmoji(){
