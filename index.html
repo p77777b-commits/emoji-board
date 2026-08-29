@@ -132,7 +132,7 @@ const ARISE_EMOJI_FRONT_GROUPS=[
   ]]
 ];
 
-const GROUP_KO={"Smileys & Emotion": "😀 표정·감정", "People & Body": "👋 사람·신체", "Component": "🧩 구성요소", "Animals & Nature": "🐶 동물·자연", "Food & Drink": "🍜 음식·음료", "Travel & Places": "🚗 여행·장소", "Activities": "⚽ 활동", "Objects": "📦 사물·도구", "Symbols": "🚦 기호", "Flags": "🏳️ 깃발"};
+const GROUP_KO={"Smileys & Emotion": "😀 표정·감정", "People & Body": "👋 사람·신체", "Component": "🧩 구성요소", "Animals & Nature": "🐶 동물·자연", "Food & Drink": "🍜 음식·음료", "Travel & Places": "🚗 여행·장소", "Activities": "🎨 활동·예술", "Objects": "🗂️ 사물·업무", "Symbols": "🚦 기호", "Flags": "🏳️ 깃발"};
 let currentView='symbol', emojiLoaded=false, allEmoji=[];
 const search=document.getElementById('search'), symbolArea=document.getElementById('symbolArea'),
       emojiArea=document.getElementById('emojiArea'), emojiSections=document.getElementById('emojiSections'),
@@ -202,7 +202,7 @@ function ariseGroupKey(el){
   return el.dataset.label || (el.querySelector('h2')?.textContent || '').replace(/\s*·\s*\d+\s*$/,'').trim();
 }
 function ariseOrderStorageKey(mode){
-  return mode==='emoji' ? 'areumGroupOrderV5_emoji' : 'areumGroupOrderV3_'+mode;
+  return mode==='emoji' ? 'areumGroupOrderV7_emoji' : 'areumGroupOrderV3_'+mode;
 }
 function ariseApplySavedOrder(container, selector, mode){
   let saved=[];
@@ -290,16 +290,36 @@ function renderGroups(groups, sourceLabel){
     sec.append(h,grid); emojiSections.appendChild(sec);
   }
 
-  for(const [label,items] of ARISE_EMOJI_FRONT_GROUPS){
-    appendEmojiSection(label,items.map(([emoji,name])=>({emoji,name})),label);
+  // 사용자 지정 그림·이모지 선두 순서
+  if(groups["Activities"]){
+    appendEmojiSection(GROUP_KO["Activities"]||"🎨 활동·예술",groups["Activities"],"Activities");
   }
 
   if(groups["Objects"]){
-    appendEmojiSection(GROUP_KO["Objects"]||"📦 사물·도구",groups["Objects"],"Objects");
+    appendEmojiSection(GROUP_KO["Objects"]||"🗂️ 사물·업무",groups["Objects"],"Objects");
+  }
+
+  const jobs=ARISE_EMOJI_FRONT_GROUPS.find(([label])=>label.includes("직업별"));
+  if(jobs){
+    appendEmojiSection(jobs[0],jobs[1].map(([emoji,name])=>({emoji,name})),jobs[0]);
+  }
+
+  if(groups["People & Body"]){
+    appendEmojiSection(GROUP_KO["People & Body"]||"👋 사람·신체",groups["People & Body"],"People & Body");
+  }
+
+  if(groups["Smileys & Emotion"]){
+    appendEmojiSection(GROUP_KO["Smileys & Emotion"]||"😀 표정·감정",groups["Smileys & Emotion"],"Smileys & Emotion");
+  }
+
+  // 생각·대화·관찰 사용자 묶음은 5개 선두 그룹 다음에 유지
+  const thought=ARISE_EMOJI_FRONT_GROUPS.find(([label])=>label.includes("생각·대화·관찰"));
+  if(thought){
+    appendEmojiSection(thought[0],thought[1].map(([emoji,name])=>({emoji,name})),thought[0]);
   }
 
   for(const [g,arr] of Object.entries(groups)){
-    if(g==="Objects") continue;
+    if(["Activities","Objects","People & Body","Smileys & Emotion"].includes(g)) continue;
     appendEmojiSection(GROUP_KO[g]||g,arr,g);
   }
 
