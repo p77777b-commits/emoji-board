@@ -1,21 +1,102 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ARISE IMAGE LIBRARY</title><style>
-
-:root{--bg:#f5f5f5;--card:#fff;--line:#dedede;--text:#171717;--muted:#6d6d6d}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,'Noto Sans KR',sans-serif}
-.wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
-.back{color:#333;text-decoration:none;font-weight:700}.pill{font-size:12px;color:#666;border:1px solid #d6d6d6;border-radius:999px;padding:6px 9px;background:#fff}
-h1{margin:0;font-size:30px}.sub{color:var(--muted);margin:7px 0 0}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-input,textarea,select,button{font:inherit}input,textarea,select{width:100%;border:1px solid #ccc;border-radius:9px;padding:10px;background:#fff}
-textarea{min-height:150px;resize:vertical}.btn{border:1px solid #bbb;background:#fff;border-radius:9px;padding:9px 12px;cursor:pointer}.btn.primary{background:#222;color:#fff;border-color:#222}
-.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-@media(max-width:680px){.grid{grid-template-columns:1fr}.wrap{padding:18px 12px 44px}}
-.notice{margin:14px 0}.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.imgcard{background:#fff;border:1px solid #ddd;border-radius:11px;overflow:hidden}.imgcard img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}.imgmeta{padding:8px;font-size:12px}@media(max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
-</style></head><body><div class="wrap"><div class="top"><a class="back" href="index.html">← HOME</a><span class="pill">v0.1</span></div><h1>🖼️ 이미지</h1><p class="sub">GitHub Pages에서 이미지 자산을 찾아보고 관리하기 위한 첫 화면입니다.</p>
-<div class="card notice"><b>현재 저장 방식</b><p class="sub">이번 버전은 이미지 보관함 UI와 목록 인덱스를 먼저 제공합니다. 실제 GitHub 저장소에 이미지를 추가하면 <code>images/</code> 폴더의 파일을 이 페이지에서 연결할 수 있습니다. 브라우저에서 선택한 로컬 이미지를 GitHub에 자동 업로드하는 기능은 인증/API 연결 단계에서 구현합니다.</p></div>
-<div class="row"><input id="q" placeholder="🔎 이미지 이름·태그 검색" oninput="render()"><button class="btn" onclick="alert('다음 공정: GitHub API 또는 외부 스토리지 연결 후 활성화')">+ 이미지 추가</button></div>
-<div id="gallery" class="gallery" style="margin-top:12px"></div></div>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ARISE IMAGE LIBRARY v0.17</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f5f5;font-family:Arial,'Noto Sans KR',sans-serif;color:#171717}
+.wrap{max-width:1180px;margin:auto;padding:24px 16px 60px}.top{display:flex;justify-content:space-between;align-items:center}.back{text-decoration:none;color:#222;font-weight:800}
+.pill,.btn{border:1px solid #ccc;background:#fff;border-radius:9px;padding:8px 10px}.btn{cursor:pointer}.primary{background:#222;color:#fff;border-color:#222}
+h1{margin:18px 0 4px}.sub{color:#707070;margin:0 0 16px}.app{display:grid;grid-template-columns:240px 1fr;gap:12px}
+.card{background:#fff;border:1px solid #ddd;border-radius:13px;padding:12px}.folders h3{margin:2px 0 10px}.tree{font-size:14px}.folder{padding:5px 4px;border-radius:7px;display:flex;gap:3px;align-items:center}.folder:hover,.folder.active{background:#eee}
+.twisty{width:20px;min-width:20px;text-align:center;cursor:pointer;user-select:none;color:#555}.twisty.blank{cursor:default}
+.foldername{cursor:pointer;flex:1;padding:2px 0}
+.folder.drop-ready{outline:2px dashed #777;background:#f0f0f0}
+.item.dragging{opacity:.45;outline:2px dashed #777}
+.hidden-tree{display:none}.child{margin-left:17px}.folder-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}.toolbar{display:grid;grid-template-columns:1fr auto auto;gap:7px}
+input,select{width:100%;border:1px solid #ccc;border-radius:8px;padding:9px;font:inherit}.filters{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.viewbar{display:flex;justify-content:flex-end;gap:7px;align-items:center;margin:8px 0}.viewbar select{width:auto;min-width:140px}
+.gallery.large{grid-template-columns:repeat(3,1fr)}.gallery.medium{grid-template-columns:repeat(4,1fr)}.gallery.small{grid-template-columns:repeat(7,1fr)}
+.gallery.list,.gallery.details{display:block}.gallery.list .item,.gallery.details .item{display:grid;grid-template-columns:54px 1fr;align-items:center;margin-bottom:5px;border-radius:8px}
+.gallery.list .thumb,.gallery.details .thumb{width:54px;height:54px;aspect-ratio:auto}.gallery.list .meta,.gallery.details .meta{padding:7px 10px}
+.gallery.list .check,.gallery.details .check{left:5px;top:5px}.gallery.list .star,.gallery.details .star{right:6px;top:6px}
+.detailsline{display:none;color:#777;margin-top:3px}.gallery.details .detailsline{display:block}
+.gallery.small .meta{padding:5px}.gallery.small .tags{display:none}.item{position:relative;border:1px solid #ddd;border-radius:11px;overflow:hidden;background:#fff}.thumb{width:100%;aspect-ratio:1/1;object-fit:cover;background:#eee;display:block}
+.meta{padding:8px;font-size:12px}.name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.check{position:absolute;left:7px;top:7px;z-index:2;width:20px;height:20px}.star{position:absolute;right:7px;top:7px;border:0;border-radius:999px;background:#fff;padding:5px;cursor:pointer}
+.batch{display:none;gap:6px;align-items:center;margin:10px 0}.batch.show{display:flex}.empty{text-align:center;color:#777;padding:45px 10px}
+.dialog{display:none;position:fixed;inset:0;background:#0006;align-items:center;justify-content:center;z-index:9;padding:15px}.dialog.open{display:flex}.panel{background:#fff;width:min(460px,100%);padding:17px;border-radius:13px}.panel label{display:block;font-size:12px;color:#555;margin:10px 0 5px}
+@media(max-width:800px){.app{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(3,1fr)}}@media(max-width:540px){.gallery{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1}}
+</style></head><body><div class="wrap">
+<div class="top"><a class="back" href="index.html">← HOME</a><span class="pill">IMAGE LIBRARY v0.17</span></div>
+<h1>🖼️ 이미지</h1><p class="sub">여러 이미지를 한 번에 등록하고 폴더별로 분류합니다.</p>
+<div class="app">
+<aside class="card folders"><h3>📁 폴더</h3><div id="tree" class="tree"></div>
+<div class="folder-actions"><button class="btn" onclick="newFolder()">+ 새 폴더</button><button class="btn" onclick="renameFolder()">이름변경</button><button class="btn" onclick="deleteFolder()">삭제</button></div></aside>
+<main>
+<div class="toolbar"><input id="q" placeholder="🔎 이름·태그 검색" oninput="renderImages()"><button class="btn primary" onclick="file.click()">+ 이미지 여러 장</button><button class="btn" onclick="selectAll()">전체선택</button></div>
+<input id="file" type="file" accept="image/*" multiple hidden onchange="addFiles(this.files)">
+<div class="viewbar"><span>보기 형식</span><select id="viewMode" onchange="setViewMode(this.value)">
+<option value="large">큰 아이콘</option><option value="medium">중간 아이콘</option><option value="small">작은 아이콘</option><option value="list">목록</option><option value="details">자세히</option>
+</select></div>
+<div class="filters"><button class="btn" onclick="view='folder';renderImages()">현재 폴더</button><button class="btn" onclick="view='all';renderImages()">전체</button><button class="btn" onclick="view='fav';renderImages()">★ 즐겨찾기</button><button class="btn" onclick="view='recent';renderImages()">최근</button></div>
+<div id="batch" class="batch"><b id="count">0개 선택</b><select id="moveTo" style="max-width:220px"></select><button class="btn" onclick="moveSelected()">폴더 이동</button><button class="btn" onclick="deleteSelected()">선택 삭제</button></div>
+<div class="card"><div id="gallery" class="gallery"></div><div id="empty" class="empty">이미지가 없습니다.</div></div>
+</main></div></div>
 <script>
-const items=JSON.parse(localStorage.getItem('ariseImageIndexV1')||'[]');function render(){let q=document.getElementById('q').value.toLowerCase(),g=document.getElementById('gallery');g.innerHTML='';items.filter(x=>(x.name+' '+(x.tags||'')).toLowerCase().includes(q)).forEach(x=>{let d=document.createElement('div');d.className='imgcard';d.innerHTML='<img src="'+x.src+'" alt=""><div class="imgmeta"><b>'+x.name+'</b><br>'+(x.tags||'')+'</div>';g.appendChild(d)})}render();
+const DB='ariseImageDB2',IS='images',FS='folders';let db,current='root',view='folder',selected=new Set();
+function odb(){return new Promise((ok,no)=>{let r=indexedDB.open(DB,1);r.onupgradeneeded=e=>{let d=e.target.result;if(!d.objectStoreNames.contains(IS))d.createObjectStore(IS,{keyPath:'id'});if(!d.objectStoreNames.contains(FS))d.createObjectStore(FS,{keyPath:'id'})};r.onsuccess=e=>{db=e.target.result;ok()};r.onerror=()=>no(r.error)})}
+function all(s){return new Promise((ok,no)=>{let r=db.transaction(s).objectStore(s).getAll();r.onsuccess=()=>ok(r.result||[]);r.onerror=()=>no(r.error)})}
+function put(s,x){return new Promise((ok,no)=>{let r=db.transaction(s,'readwrite').objectStore(s).put(x);r.onsuccess=ok;r.onerror=()=>no(r.error)})}
+function del(s,id){return new Promise((ok,no)=>{let r=db.transaction(s,'readwrite').objectStore(s).delete(id);r.onsuccess=ok;r.onerror=()=>no(r.error)})}
+async function ensure(){let f=await all(FS);if(!f.some(x=>x.id==='root'))await put(FS,{id:'root',name:'전체 이미지',parent:null,createdAt:0})}
+async function renderTree(){
+ let f=await all(FS),box=document.getElementById('tree');box.innerHTML='';
+ let expanded=JSON.parse(localStorage.getItem('ariseImageExpandedFoldersV1')||'{}');
+ function hasKids(id){return f.some(x=>x.parent===id)}
+ function node(x,host,rootNode=false){
+   let row=document.createElement('div');row.className='folder'+(x.id===current?' active':'');
+   row.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';row.classList.add('drop-ready')});
+   row.addEventListener('dragleave',()=>row.classList.remove('drop-ready'));
+   row.addEventListener('drop',async e=>{
+     e.preventDefault();e.stopPropagation();row.classList.remove('drop-ready');
+     let ids=[];try{ids=JSON.parse(e.dataTransfer.getData('application/x-arise-image-ids')||'[]')}catch(err){}
+     if(!ids.length)return;
+     await moveIdsToFolder(ids,x.id);
+   });
+   let has=hasKids(x.id),isOpen=expanded[x.id]!==false;
+   let t=document.createElement('span');t.className='twisty'+(has?'':' blank');t.textContent=has?(isOpen?'▾':'▸'):'';
+   if(has)t.onclick=e=>{e.stopPropagation();expanded[x.id]=!isOpen;localStorage.setItem('ariseImageExpandedFoldersV1',JSON.stringify(expanded));renderTree()};
+   let n=document.createElement('span');n.className='foldername';n.textContent=(rootNode?'📁 ':'📂 ')+x.name;
+   n.onclick=()=>{current=x.id;view=x.id==='root'?'all':'folder';selected.clear();renderTree();renderImages()};
+   row.append(t,n);host.appendChild(row);
+   if(has){let ch=document.createElement('div');ch.className='child'+(isOpen?'':' hidden-tree');host.appendChild(ch);f.filter(y=>y.parent===x.id).sort((a,b)=>a.createdAt-b.createdAt).forEach(y=>node(y,ch,false))}
+ }
+ let root=f.find(x=>x.id==='root');if(root)node(root,box,true);fillMove(f)
+}
+function fillMove(f){let s=document.getElementById('moveTo');s.innerHTML='';f.forEach(x=>{let o=document.createElement('option');o.value=x.id;o.textContent=x.name;s.appendChild(o)})}
+async function newFolder(){let n=prompt('새 폴더 이름');if(!n)return;await put(FS,{id:crypto.randomUUID(),name:n.trim(),parent:current==='root'?'root':current,createdAt:Date.now()});renderTree()}
+async function renameFolder(){if(current==='root')return alert('전체 이미지는 이름을 바꿀 수 없습니다.');let f=await all(FS),x=f.find(x=>x.id===current),n=prompt('폴더 이름',x.name);if(n){x.name=n.trim();await put(FS,x);renderTree()}}
+async function deleteFolder(){if(current==='root')return;let f=await all(FS);if(f.some(x=>x.parent===current))return alert('하위 폴더가 있어 삭제할 수 없습니다.');let imgs=await all(IS);if(imgs.some(x=>x.folder===current))return alert('폴더 안 이미지를 먼저 이동하거나 삭제하세요.');if(confirm('폴더를 삭제할까요?')){await del(FS,current);current='root';renderTree();renderImages()}}
+async function addFiles(files){for(const file of [...files])if(file.type.startsWith('image/'))await put(IS,{id:crypto.randomUUID(),name:file.name.replace(/\.[^.]+$/,''),tags:'',folder:current==='root'?'root':current,fav:false,createdAt:Date.now(),blob:file});document.getElementById('file').value='';renderImages()}
+async function renderImages(){let a=await all(IS),q=document.getElementById('q').value.toLowerCase();a=a.filter(x=>(x.name+' '+x.tags).toLowerCase().includes(q));if(view==='folder')a=a.filter(x=>x.folder===current);if(view==='fav')a=a.filter(x=>x.fav);a.sort((a,b)=>b.createdAt-a.createdAt);if(view==='recent')a=a.slice(0,50);let g=document.getElementById('gallery');g.className='gallery '+getViewMode();g.innerHTML='';document.getElementById('empty').style.display=a.length?'none':'block';a.forEach(x=>{let d=document.createElement('div');d.className='item';d.draggable=true;let u=URL.createObjectURL(x.blob);
+  d.addEventListener('dragstart',e=>{
+    let ids=selected.has(x.id)?[...selected]:[x.id];
+    if(!selected.has(x.id)){selected.clear();selected.add(x.id);batch()}
+    d.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('application/x-arise-image-ids',JSON.stringify(ids));
+    e.dataTransfer.setData('text/plain',ids.join(','));
+  });
+  d.addEventListener('dragend',()=>{d.classList.remove('dragging');document.querySelectorAll('.folder').forEach(f=>f.classList.remove('drop-ready'))});d.innerHTML='<input class="check" type="checkbox"><button class="star">'+(x.fav?'★':'☆')+'</button><img class="thumb"><div class="meta"><div class="name"></div><div class="tags"></div><div class="detailsline"></div></div>';d.querySelector('img').src=u;d.querySelector('.name').textContent=x.name;d.querySelector('.tags').textContent=x.tags||'태그 없음';let kb=x.blob&&x.blob.size?Math.round(x.blob.size/1024)+' KB':'';d.querySelector('.detailsline').textContent=new Date(x.createdAt).toLocaleString()+(kb?' · '+kb:'');let c=d.querySelector('.check');c.checked=selected.has(x.id);c.onchange=()=>{c.checked?selected.add(x.id):selected.delete(x.id);batch()};d.querySelector('.star').onclick=async()=>{x.fav=!x.fav;await put(IS,x);renderImages()};g.appendChild(d)});batch()}
+function batch(){document.getElementById('count').textContent=selected.size+'개 선택';document.getElementById('batch').className='batch'+(selected.size?' show':'')}
+async function selectAll(){let a=await all(IS);a.forEach(x=>selected.add(x.id));renderImages()}
+async function moveIdsToFolder(ids,to){
+ let a=await all(IS),changed=0;
+ for(let x of a.filter(x=>ids.includes(x.id))){if(x.folder!==to){x.folder=to;await put(IS,x);changed++}}
+ selected.clear();await renderImages();await renderTree();
+}
+async function moveSelected(){let to=document.getElementById('moveTo').value;await moveIdsToFolder([...selected],to)}
+async function deleteSelected(){if(!selected.size||!confirm(selected.size+'개 이미지를 삭제할까요?'))return;for(let id of selected)await del(IS,id);selected.clear();renderImages()}
+function getViewMode(){return localStorage.getItem('ariseImageViewModeV1')||'medium'}
+function setViewMode(v){localStorage.setItem('ariseImageViewModeV1',v);renderImages()}
+document.getElementById('viewMode').value=getViewMode();
+odb().then(ensure).then(()=>{renderTree();renderImages()});
 </script></body></html>
